@@ -166,4 +166,4 @@ curl -X POST http://127.0.0.1:8000/api/predict/female \
 
 ## License
 
-Add a license of your choice (e.g. MIT) before publishing. Remember that the underlying datasets carry their own terms of use.
+The source code is released under the [MIT License](LICENSE). The datasets in `datasets/` come from third-party public sources and remain subject to their original terms of use.
