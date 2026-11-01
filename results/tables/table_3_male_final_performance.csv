@@ -1,0 +1,2 @@
+Dataset,N,Model,Validation,ROC_AUC,PR_AUC,Balanced_Accuracy,Sensitivity,Specificity,Precision,F1,Operating_Threshold,ROC_AUC_CI_Lower,ROC_AUC_CI_Upper
+Male plasma metabolomics,113,L1 Logistic Regression,5-fold out-of-fold validation,0.9865,0.9956,0.9643,0.9286,1.0,1.0,0.963,0.63,,

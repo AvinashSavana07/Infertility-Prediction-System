@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Infertility Prediction</title>
+<style>
+:root{--ink:#0f1b2d;--mut:#64748b;--line:#e3e8ef;--bg:#f4f6fa;--card:#fff;--navy:#0b1730;--navy2:#13244a;--blue:#2563eb;--teal:#0d9488;--rose:#e11d48;--sky:#0284c7;--amber:#b45309;
+--sh:0 1px 2px rgba(15,27,45,.05),0 8px 24px rgba(15,27,45,.06)}
+*{box-sizing:border-box}html,body{margin:0}
+body{font-family:Inter,"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5}
+.shell{display:grid;grid-template-columns:268px 1fr;min-height:100vh}
+/* sidebar */
+.side{background:linear-gradient(180deg,var(--navy),var(--navy2));color:#cbd5e1;padding:24px 16px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column}
+.brand{display:flex;gap:12px;align-items:center;padding:0 8px 22px;border-bottom:1px solid rgba(255,255,255,.08)}
+.logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#3b82f6,#14b8a6);display:grid;place-items:center;color:#fff;font-weight:800;letter-spacing:.5px}
+.brand b{display:block;color:#fff;font-size:15px}.brand span{font-size:11.5px;color:#8da2c0}
+.nav{margin-top:20px;display:flex;flex-direction:column;gap:4px}
+.nav small{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#6b82a6;padding:0 10px 6px}
+.nav a{display:flex;gap:12px;align-items:center;padding:11px 12px;border-radius:10px;color:#b8c6dc;text-decoration:none;font-weight:600;font-size:13.5px;transition:.15s}
+.nav a svg{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav a:hover{background:rgba(255,255,255,.06);color:#fff}
+.nav a.on{background:linear-gradient(90deg,rgba(59,130,246,.28),rgba(20,184,166,.14));color:#fff;box-shadow:inset 3px 0 0 #60a5fa}
+.sfoot{margin-top:auto;padding:14px;border-radius:12px;background:rgba(255,255,255,.05);font-size:12px;color:#94a8c6}
+.pill{display:flex;align-items:center;gap:7px;font-weight:600;color:#e2e8f0;margin-bottom:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:#f59e0b}.dot.ok{background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,.18)}.dot.bad{background:#ef4444}
+/* main */
+.main{padding:28px 36px 40px;min-width:0}
+.view{display:none;animation:in .25s ease}.view.on{display:block}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+.banner{position:relative;border-radius:18px;overflow:hidden;color:#fff;min-height:132px;display:flex;align-items:flex-end;padding:24px 28px;box-shadow:var(--sh);background:var(--navy)}
+.banner .art{position:absolute;inset:0}.banner .art svg{width:100%;height:100%;display:block}
+.banner div.t{position:relative;z-index:1}.banner:after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:linear-gradient(90deg,rgba(6,16,38,.72),rgba(6,16,38,.25) 55%,rgba(6,16,38,0))}.banner h1{margin:0;font-size:26px;letter-spacing:-.02em}.banner p{margin:4px 0 0;color:#cfe0f7;font-size:13.5px}
+.seg{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:12px;padding:4px;margin:20px 0 18px;box-shadow:var(--sh)}
+.seg button{border:0;background:none;padding:9px 20px;border-radius:9px;font:inherit;font-weight:700;color:var(--mut);cursor:pointer;transition:.15s}
+.seg button.on{background:var(--blue);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,.35)}
+.grid2{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(320px,1fr);gap:20px;align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);padding:22px}
+.card h3{margin:0;font-size:16px}.ch{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:16px}
+.ch p{margin:2px 0 0;color:var(--mut);font-size:12.5px}
+.tag{background:#eff6ff;color:#1d4ed8;font-weight:700;font-size:12px;padding:5px 11px;border-radius:99px;white-space:nowrap}
+textarea,input,select{width:100%;font:inherit;color:var(--ink);background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:10px 12px;transition:.15s}
+textarea{min-height:64px;resize:vertical;font-family:ui-monospace,Consolas,monospace;font-size:12.5px}
+input:focus,textarea:focus,select:focus{outline:0;border-color:#60a5fa;background:#fff;box-shadow:0 0 0 4px rgba(59,130,246,.15)}
+label{display:block;font-size:12px;font-weight:700;color:#334155;margin-bottom:5px}
+label i{font-style:normal;font-weight:500;color:#94a3b8;margin-left:4px}
+.fg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px}
+.fg.m{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;max-height:560px;overflow:auto;padding:4px 6px 4px 2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.btn{border:0;border-radius:10px;padding:11px 20px;font:inherit;font-weight:700;cursor:pointer;transition:.15s}
+.p{background:linear-gradient(135deg,#2563eb,#0d9488);color:#fff;box-shadow:0 6px 16px rgba(37,99,235,.3)}.p:hover{transform:translateY(-1px)}
+.s{background:#eef2f7;color:#1e293b}.g{background:#fff;border:1px solid var(--line);color:#475569}
+.res{position:sticky;top:20px}
+.empty{text-align:center;padding:26px 8px;color:var(--mut)}.empty .art{height:120px;border-radius:12px;overflow:hidden;margin-bottom:14px}.empty .art svg{width:100%;height:100%}
+.verdict{font-size:24px;font-weight:800;letter-spacing:-.01em;margin:2px 0 14px}.verdict.pos{color:var(--rose)}.verdict.neg{color:var(--teal)}
+.lab{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);font-weight:700}
+.mets{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.met{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:12px}.met span{font-size:11.5px;color:var(--mut)}.met b{display:block;font-size:20px}
+.gauge{position:relative;height:12px;border-radius:99px;background:linear-gradient(90deg,#5eead4,#fde68a,#fb7185);margin:22px 0 6px}
+.gauge .k{position:absolute;top:-6px;width:4px;height:24px;border-radius:3px;background:var(--ink)}
+.gauge .kp{position:absolute;top:-4px;width:20px;height:20px;border-radius:50%;background:#fff;border:4px solid var(--ink);transform:translateX(-50%)}
+.gl{display:flex;justify-content:space-between;font-size:11px;color:var(--mut)}
+.sh h4{margin:18px 0 10px;font-size:13px}
+.si{display:grid;grid-template-columns:1fr auto;gap:2px 10px;margin-bottom:9px;font-size:12.5px}.si b{font-variant-numeric:tabular-nums}
+.bw{grid-column:1/-1;height:7px;background:#eef2f7;border-radius:9px;overflow:hidden}.bar{height:100%;border-radius:9px}
+.pos .bar,.bar.pos{background:var(--rose)}.bar.neg{background:var(--sky)}
+.err{color:var(--amber);font-size:12.5px}.hint{font-size:11.5px;color:var(--mut);margin-top:10px}
+/* info views */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-top:20px}
+.term{padding:14px 0;border-bottom:1px solid var(--line)}.term:last-child{border:0}.term b{display:block;margin-bottom:2px}.term span{color:var(--mut)}
+.ir{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)}.ir:last-child{border:0}.ir span{color:var(--mut)}
+.bt{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;margin:10px 0;font-size:12.5px}
+.trk{position:relative;height:12px;background:#eef2f7;border-radius:9px}.trk .z{position:absolute;top:-3px;bottom:-3px;width:2px;background:#94a3b8}
+.trk .f{position:absolute;top:0;bottom:0;border-radius:9px}
+.note{margin-top:16px;background:#f0f9ff;border:1px solid #bae6fd;color:#0c4a6e;border-radius:12px;padding:12px 14px;font-size:12.5px}
+.pk{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:20px 0 6px}
+.pk div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--sh)}.pk span{font-size:11.5px;color:var(--mut)}.pk b{display:block;font-size:22px;letter-spacing:-.01em}
+.ph{margin:30px 0 12px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);font-weight:700;display:flex;align-items:center;gap:10px}.ph:after{content:"";flex:1;height:1px;background:var(--line)}
+.fgal{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:18px}
+.fig{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--sh);overflow:hidden;cursor:zoom-in;transition:.15s}.fig:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(15,27,45,.12)}
+.fig .im{background:#fff;padding:12px;border-bottom:1px solid var(--line);height:300px;display:grid;place-items:center}.fig img{max-width:100%;max-height:100%;display:block}
+.fig .c{padding:12px 16px 14px}.fig b{display:block;font-size:13.5px}.fig span{font-size:12px;color:var(--mut)}
+#lb{position:fixed;inset:0;background:rgba(8,15,30,.82);display:none;place-items:center;z-index:50;padding:30px;cursor:zoom-out}#lb.on{display:grid}#lb img{max-width:100%;max-height:100%;background:#fff;border-radius:12px}
+.chip{display:inline-block;font-size:12px;font-weight:700;padding:5px 11px;border-radius:99px}.chip.bad{background:#fff1f2;color:#be123c}.chip.good{background:#ecfdf5;color:#047857}
+.ir b small{font-weight:500;color:var(--mut);margin-left:6px;font-size:11.5px}
+.lim{margin:16px 0 0;padding:0;list-style:none}.lim li{position:relative;padding:8px 0 8px 22px;border-top:1px solid var(--line);font-size:13px;color:#334155}.lim li:before{content:"";position:absolute;left:3px;top:15px;width:8px;height:8px;border-radius:50%;background:#f59e0b}
+.sub{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--mut);margin:18px 0 4px}
+table.tb{width:100%;border-collapse:collapse;font-size:13px}.tb th{text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);padding:8px 6px;border-bottom:1px solid var(--line)}.tb td{padding:9px 6px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}.tb tr.hl td{background:#eff6ff;font-weight:700}
+.dca svg{width:100%;height:auto;display:block}.lg{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--mut);margin:6px 0 10px}.lg i{display:inline-block;width:18px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+
+body{background:linear-gradient(180deg,#f4f8ff,#edf2fa)}
+.shell{grid-template-columns:272px 1fr;grid-template-rows:72px 1fr}
+.top{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;padding:0 26px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.top .brand{padding:0;border:0}.top .brand b{color:var(--ink);font-size:19px}.top .brand span{color:#64748b;font-size:13px}
+.stt{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#334155}
+.av{width:38px;height:38px;border-radius:50%;background:#eef2f9;display:grid;place-items:center;color:#64748b;margin-left:16px}.av svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8}
+.side{background:#f8fbff;color:var(--ink);border-right:1px solid var(--line);top:72px;height:calc(100vh - 72px);padding:18px 14px}
+.nav{margin-top:0;gap:6px}.nav a{color:#334155;padding:8px 10px;border-radius:12px}.nav a:hover{background:#eaf2ff;color:#1d4ed8}
+.nav a.on{background:linear-gradient(90deg,#1d63ed,#5aa8ff);color:#fff;box-shadow:0 8px 18px rgba(37,99,235,.28)}
+.nav .ic{width:34px;height:34px;border-radius:10px;background:#e6effd;color:#2563eb;display:grid;place-items:center;flex:none}.nav a.on .ic{background:rgba(255,255,255,.22);color:#fff}
+.sart{margin-top:auto;text-align:center}.sart .im{height:170px}.sart .im svg{width:100%;height:100%}.sart p{margin:0;font-style:italic;color:#64748b;font-size:12.5px}.sart small{display:block;margin-top:8px;font-size:11px;color:#94a3b8}
+.main{padding:22px 26px 36px}
+.view{background:#fff;border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:var(--sh)}
+.view .card{box-shadow:none;border-color:#e3eaf4}
+.banner{background:linear-gradient(100deg,#f2f7ff,#dcebff 60%,#cfe3ff);color:var(--ink);min-height:124px;align-items:center;box-shadow:none;border:1px solid #dbe7f7;border-radius:16px;padding:20px 26px}
+.banner:after{display:none}.banner h1{color:#0f1b2d;font-size:28px}.banner p{color:#52637d;max-width:540px;font-size:14px}
+.step{display:flex;gap:12px;align-items:center;margin:24px 0 12px}.step i{width:30px;height:30px;border-radius:50%;background:#1d63ed;color:#fff;font-style:normal;font-weight:700;display:grid;place-items:center;flex:none}.step h2{margin:0;font-size:17px}.step p{margin:0;font-size:12.5px;color:var(--mut)}
+.mcs{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.mc{position:relative;display:flex;gap:16px;align-items:center;text-align:left;font:inherit;background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:18px 20px;cursor:pointer;transition:.15s}.mc:hover{border-color:#93b8f5}
+.mc.on{border:2px solid #2563eb;background:#f5f9ff;box-shadow:0 0 0 4px rgba(37,99,235,.08)}
+.mi{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;flex:none}.mi svg{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round}.mi.f{background:#fde4ef;color:#e0558a}.mi.m{background:#dbeafe;color:#2563eb}
+.mt b{display:block;font-size:16px;color:var(--ink)}.mt small{display:block;color:var(--mut);font-size:12.5px;margin:2px 0 8px}.mt em{font-style:normal;font-size:11.5px;font-weight:600;background:#e8f1ff;color:#1d4ed8;padding:3px 10px;border-radius:7px}
+.tick{position:absolute;top:12px;right:14px;width:22px;height:22px;border-radius:50%;background:#2563eb;color:#fff;font-size:13px;display:none;place-items:center}.mc.on .tick{display:grid}
+.fg{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}.fg.m{grid-template-columns:repeat(auto-fill,minmax(190px,1fr));max-height:none;overflow:visible;padding:0}
+.in{position:relative}.in input{padding-right:38px;background:#fff}.in svg{position:absolute;right:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:#7b8da8;fill:none;stroke-width:1.8;stroke-linecap:round;pointer-events:none}
+select{background:#fff}::placeholder{color:#a3b0c4}
+.p{background:linear-gradient(135deg,#1d63ed,#3b82f6);box-shadow:0 6px 16px rgba(37,99,235,.3)}
+details.qf{margin-top:16px;border:1px dashed #cfdbec;border-radius:12px;padding:10px 14px;background:#fafcff}.qf summary{cursor:pointer;font-weight:600;font-size:13px;color:#334155}.qf textarea{margin-top:10px}
+.resbox{margin-top:22px;border:1px solid #bfe9d6;background:linear-gradient(180deg,#f1fbf6,#e9f8f1);border-radius:16px;padding:16px 20px}.resbox.hi{border-color:#fbc9d3;background:linear-gradient(180deg,#fff6f8,#fff0f3)}
+.rh{display:flex;align-items:center;gap:12px;margin-bottom:12px}.rh b{font-size:17px;color:#0b5d49}.hi .rh b{color:#9f1239}
+.ck{width:30px;height:30px;border-radius:50%;background:#16a34a;color:#fff;display:grid;place-items:center}.hi .ck{background:#e11d48}
+.chip2{margin-left:auto;background:#dcf5ea;color:#0b6b4f;font-size:12px;font-weight:600;padding:5px 12px;border-radius:99px}.hi .chip2{background:#ffe1e7;color:#9f1239}
+.rg{display:grid;grid-template-columns:190px minmax(0,1fr) minmax(0,1.4fr);gap:22px;align-items:center}
+.dn{text-align:center}.dn svg{width:150px;height:150px}.dn span{display:block;font-size:12.5px;font-weight:600;color:#334155}
+.oc{background:#e0f5ec;border-radius:14px;padding:20px;display:flex;gap:14px;align-items:center}.hi .oc{background:#ffe6eb}
+.oc small{display:block;color:#52637d;font-size:12px}.oc b{display:block;font-size:26px;color:#0f9b6c}.hi .oc b{color:#e11d48}
+.sbars h4{margin:0 0 10px;font-size:13px}.sb{display:grid;grid-template-columns:140px 1fr 54px;gap:10px;align-items:center;font-size:12.5px;margin:7px 0}
+.sb .t{height:8px;background:#e1e8f2;border-radius:9px;overflow:hidden}.sb .t i{display:block;height:100%;border-radius:9px}.sb .p i{background:#3b82f6}.sb .n i{background:#ec6b9b}.sb b{text-align:right;font-variant-numeric:tabular-nums}
+.fig .im{height:auto;padding:14px 12px 8px;display:block}.fig svg{width:100%;height:auto;display:block}
+.cm{display:grid;grid-template-columns:84px 1fr 1fr;gap:8px;font-size:12px;color:#64748b}.cm .h{text-align:center;font-weight:600;align-self:end;padding-bottom:2px}.cm .rl{display:flex;align-items:center;font-weight:600;line-height:1.2}
+.cm .c{border-radius:12px;padding:22px 8px;text-align:center}.cm .c b{display:block;font-size:30px;color:#0f1b2d;line-height:1.1}.cm .c span{font-size:11px;color:#334155}
+.fgal{grid-template-columns:repeat(2,minmax(0,1fr))}.fig.full{grid-column:1/-1}.fig.full .im svg{max-width:780px;margin:0 auto}
+.cat{display:block;font-style:normal;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#94a3b8;font-weight:700;margin-bottom:3px}
+@media(max-width:900px){.fgal{grid-template-columns:1fr}}
+.pk{grid-template-columns:repeat(auto-fit,minmax(210px,1fr));align-items:start}.pk p{margin:6px 0 0;font-size:11.5px;color:#64748b;line-height:1.45}
+.bd{font-style:normal;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;margin-left:8px;vertical-align:middle;letter-spacing:0}.bd.e{background:#e7f8f0;color:#047857}.bd.g{background:#e8f4ff;color:#1d4ed8}.bd.f{background:#fff7e6;color:#b45309}.bd.l{background:#fff1f2;color:#be123c}
+.fig{cursor:default}.fig .im{cursor:zoom-in}.fig:hover{transform:none}
+.gd{padding:0 16px 16px;display:grid;gap:10px}.gd>div{background:#f5f9ff;border:1px solid #e1ebfa;border-radius:12px;padding:10px 12px;font-size:12.5px;color:#334155;line-height:1.5}.gd>div:last-child{background:#f0fdf9;border-color:#ccefe3}
+.gd b{display:block;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#64748b;margin-bottom:3px}.gd p{margin:0}
+#lb{cursor:zoom-out}.lbc{background:#fff;border-radius:16px;padding:22px;width:min(920px,94vw);max-height:92vh;overflow:auto;cursor:default}.lbc svg{width:100%;height:auto}
+@media(max-width:1100px){.rg{grid-template-columns:1fr}}
+@media(max-width:820px){.sart,.stt span:last-child{display:none}.mcs{grid-template-columns:1fr}.top{padding:0 14px}.top .brand span{display:none}}
+@media(max-width:1100px){.grid2{grid-template-columns:1fr}.res{position:static}.fg.m{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:820px){.shell{grid-template-columns:1fr}.side{position:static;height:auto}.nav{flex-direction:row;overflow:auto}.nav small,.sfoot{display:none}.main{padding:18px}.fg,.fg.m{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header class="top">
+  <div class="brand"><div class="logo">IM</div><div><b>Infertility Prediction</b><span>Explainable Machine Learning Research Interface</span></div></div>
+  <div style="display:flex;align-items:center"><div class="stt"><i class="dot" id="dot"></i><span id="apiTxt">Checking…</span></div><span class="av"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span></div>
+</header>
+<aside class="side">
+  <nav class="nav" id="nav"></nav>
+  <div class="sart"><div class="im" id="sart"></div><p>Better insights.<br>For healthier tomorrows.</p><small>Research use only. Not a medical diagnosis.</small></div>
+</aside>
+
+<main class="main">
+  <!-- PREDICTION -->
+  <section class="view" id="v-predict">
+    <div class="banner"><div class="art" data-art="1"></div><div class="t"><h1>Infertility Risk Prediction</h1><p>Use validated machine learning models to estimate the probability of infertility based on clinical and metabolomic features.</p></div></div>
+    <div class="step"><i>1</i><h2>Select Prediction Model</h2></div>
+    <div class="mcs" id="seg">
+      <button class="mc on" data-model="female"><span class="mi f"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="5"/><path d="M12 14v8M8.5 18h7"/></svg></span><span class="mt"><b>Female Prediction</b><small>Uses 10 demographic &amp; reproductive features</small><em>Population Level</em></span><span class="tick">✓</span></button>
+      <button class="mc" data-model="male"><span class="mi m"><svg viewBox="0 0 24 24"><circle cx="10" cy="14" r="5"/><path d="M14 10l6-6M14.5 4H20v5.5"/></svg></span><span class="mt"><b>Male Prediction</b><small>Uses 50 metabolomic features</small><em>Metabolomic Level</em></span><span class="tick">✓</span></button>
+    </div>
+    <div class="step"><i>2</i><div><h2>Enter Patient Information</h2><p>Provide the required input values for the selected model.</p></div></div>
+    <div class="card" id="femalePanel">
+      <div class="ch"><div><h3>Demographic &amp; Reproductive Features (10)</h3></div><span class="tag">Threshold 0.52</span></div>
+      <div class="fg" id="femaleFields"></div>
+      <details class="qf"><summary>Quick fill: paste all values</summary><textarea id="femalePaste" placeholder="32, 2.45, 13, 3, 4, 1, 1, 2, 1, 2"></textarea><div class="row"><button class="btn s" onclick="fillFemaleFromPaste()">Fill fields</button></div></details>
+      <div class="row"><button class="btn p" onclick="predict('female')">✦ Run Prediction</button><button class="btn g" onclick="loadSampleFemale()">Load sample</button><button class="btn g" onclick="clearForm('female')">Clear</button></div>
+    </div>
+    <div class="card" id="malePanel" style="display:none">
+      <div class="ch"><div><h3>Metabolomic Features (50)</h3></div><span class="tag">Threshold 0.63</span></div>
+      <div class="fg m" id="maleFields"></div><div class="hint">Hover a metabolite name to see what it is.</div>
+      <details class="qf"><summary>Quick fill: paste all values</summary><textarea id="malePaste" placeholder="Paste 50 comma-separated values"></textarea><div class="row"><button class="btn s" onclick="fillMaleFromPaste()">Fill fields</button></div></details>
+      <div class="row"><button class="btn p" onclick="predict('male')">✦ Run Prediction</button><button class="btn g" onclick="loadSampleMale()">Load sample</button><button class="btn g" onclick="clearForm('male')">Clear</button></div>
+    </div>
+    <div class="resbox" id="result" style="display:none"></div>
+  </section>
+
+  <!-- TERMS -->
+  <section class="view" id="v-terms">
+    <div class="banner"><div class="art" data-art="2"></div><div class="t"><h1>What do the terms mean?</h1><p>Plain-language guide to the concepts used in this tool.</p></div></div>
+    <div class="card" style="margin-top:20px;max-width:820px">
+      <div class="term"><b>SHAP — “Why this prediction?”</b><span>Shows which inputs pushed an individual prediction higher or lower.</span></div>
+      <div class="term"><b>DCA — “How useful is the prediction?”</b><span>Compares the model’s net benefit with treat-all and treat-none strategies.</span></div>
+      <div class="term"><b>Threshold</b><span>The probability cut-off above which the model reports higher risk.</span></div>
+      <div class="term"><b>ROC-AUC</b><span>How well the model separates the two groups; 0.5 is chance, 1.0 is perfect.</span></div>
+      <div class="term"><b>Population-level</b><span>Uses demographic, socioeconomic and reproductive-health survey data (NHANES).</span></div>
+      <div class="term"><b>Metabolomic</b><span>Uses chemical compounds (metabolites) measured in blood plasma.</span></div>
+    </div>
+  </section>
+
+  <!-- MODEL -->
+  <section class="view" id="v-model">
+    <div class="banner"><div class="art" data-art="3"></div><div class="t"><h1>Model information</h1><p>Validated characteristics of the two pipelines.</p></div></div>
+    <div class="cards" id="modelCards"></div>
+    <div class="cards" id="modelTables"></div>
+    <div class="note" style="max-width:820px">Values describe the evaluated research datasets and are not evidence of clinical effectiveness or external validity.</div>
+  </section>
+
+  <!-- PERFORMANCE -->
+  <section class="view" id="v-perf">
+    <div class="banner"><div class="art" data-art="5"></div><div class="t"><h1>Model performance</h1><p>ROC, precision-recall, confusion matrices, SHAP and decision curves. Click any figure to enlarge.</p></div></div>
+    <div class="seg" id="segPerf"><button class="on" data-model="female">Female · Population-level</button><button data-model="male">Male · Metabolomic</button></div>
+    <div id="perfBody"></div>
+  </section>
+  <div id="lb"><div class="lbc"></div></div>
+
+  <!-- DCA -->
+  <section class="view" id="v-dca">
+    <div class="banner"><div class="art" data-art="4"></div><div class="t"><h1>Decision analysis</h1><p>Net benefit at each validated threshold.</p></div></div>
+    <div class="cards" id="dcaCards"></div>
+    <div class="note" style="max-width:820px"><b>How to read it:</b> a model is useful at a threshold only if its blue line is above both treat-all and treat-none (zero). At the female model’s thresholds it is not, so it should be read as a research result, not a decision aid.</div>
+  </section>
+</main>
+</div>
+
+<script>
+const API_BASE = window.location.origin;
+const FEMALE_FEATURES = [
+  "RIDAGEYR","INDFMPIR","RHQ010","RIDRETH3","DMDEDUC2",
+  "DMDMARTL","RHQ031","RHQ078","RHQ131","RHQ172"
+];
+
+const MALE_FEATURES = [
+  "Oxalic acid","Lactate","Alanine","Glycine","α-hydroxybutyrate",
+  "N-acetylglycine","Acetic acid","β-hydroxybutyric acid","Valine",
+  "2-Aminobutyric acid","Urea","Leucine","Phosphoric acid","Glycerol",
+  "Isoleucine","Proline","Glycerate","Glyceric acid","Methylmalonic acid",
+  "Fumarate","Serine","Threonine","Aminomalonic acid","Pyroglutamic acid",
+  "2,3,4-Trihydroxybutyric acid","Citrulline","Glutamic acid",
+  "Phenylalanine","Ribitol","L-Lysine","Hypoxanthine","Ornithine",
+  "Citrate","1,5-Anhydro-sorbitol","Fructose","Galactose","Glucose",
+  "Mannose","Tyrosine","Allonic acid","α-D-Galactopyranose",
+  "Palmitelaidic acid","Palmitic acid","Myo-Inositol","Uric acid",
+  "Tryptophan","Linoleic acid","Oleic acid","Stearic acid","Arachidonic acid"
+];
+
+const MODEL_INFO = {
+  female: {
+    model:"Random Forest (female population-level)",
+    features:"10",
+    threshold:"0.52",
+    roc:"0.7237",
+    pr:"0.2168",
+    sensitivity:"0.6629",
+    specificity:"0.6667",
+    f1:"0.3026",
+    balanced:"0.6648"
+  },
+  male: {
+    model:"Logistic Regression (male metabolomic)",
+    features:"50",
+    threshold:"0.63",
+    roc:"0.9865",
+    pr:"0.9956",
+    sensitivity:"0.9286",
+    specificity:"1.0000",
+    f1:"0.9630",
+    balanced:"0.9643"
+  }
+};
+
+const DCA = {
+  female:{threshold:"0.52", model:"−0.2493", all:"−0.8558", none:"0"},
+  male:{threshold:"0.63", model:"0.6903", all:"0.3064", none:"0"}
+};
+
+const MALE_FEATURE_MEANINGS = {
+  "Oxalic acid": "An organic acid involved in oxalate metabolism.",
+  "Lactate": "A product of glucose breakdown and cellular energy metabolism.",
+  "Alanine": "An amino acid involved in protein and glucose metabolism.",
+  "Glycine": "An amino acid used in protein, heme, and other metabolic pathways.",
+  "α-hydroxybutyrate": "An organic acid associated with amino-acid metabolism and cellular redox balance.",
+  "N-acetylglycine": "An acetylated form of glycine involved in amino-acid metabolism.",
+  "Acetic acid": "A short-chain organic acid connected to acetyl-CoA and energy metabolism.",
+  "β-hydroxybutyric acid": "A ketone body produced during fat breakdown for energy.",
+  "Valine": "An essential branched-chain amino acid used in protein metabolism.",
+  "2-Aminobutyric acid": "A non-protein amino acid associated with amino-acid and redox metabolism.",
+  "Urea": "The main end product of nitrogen disposal from protein metabolism.",
+  "Leucine": "An essential branched-chain amino acid important in protein metabolism.",
+  "Phosphoric acid": "A phosphate-containing compound related to energy and nucleotide metabolism.",
+  "Glycerol": "A component of triglycerides and an important molecule in lipid metabolism.",
+  "Isoleucine": "An essential branched-chain amino acid involved in protein and energy metabolism.",
+  "Proline": "An amino acid important in proteins and connective-tissue metabolism.",
+  "Glycerate": "An organic acid involved in carbohydrate and serine-related metabolism.",
+  "Glyceric acid": "An organic acid associated with carbohydrate and serine metabolism.",
+  "Methylmalonic acid": "A metabolite in propionate metabolism and a marker linked to vitamin B12-dependent pathways.",
+  "Fumarate": "An intermediate of the citric acid (TCA) cycle used in cellular energy production.",
+  "Serine": "An amino acid involved in protein synthesis and one-carbon metabolism.",
+  "Threonine": "An essential amino acid used in protein and amino-acid metabolism.",
+  "Aminomalonic acid": "An amino-acid-related metabolite detected in metabolic profiling.",
+  "Pyroglutamic acid": "Also called 5-oxoproline; involved in the glutathione-related metabolic cycle.",
+  "2,3,4-Trihydroxybutyric acid": "An organic acid detected in metabolic profiling and related to carbohydrate metabolism.",
+  "Citrulline": "An amino acid involved in the urea cycle and nitric-oxide-related metabolism.",
+  "Glutamic acid": "An amino acid central to nitrogen metabolism and protein synthesis.",
+  "Phenylalanine": "An essential amino acid and precursor of tyrosine.",
+  "Ribitol": "A sugar alcohol involved in carbohydrate-related metabolism.",
+  "L-Lysine": "An essential amino acid required for protein synthesis.",
+  "Hypoxanthine": "A purine-related compound involved in nucleotide metabolism.",
+  "Ornithine": "An amino acid involved in the urea cycle and nitrogen disposal.",
+  "Citrate": "A citric-acid-cycle intermediate involved in cellular energy and carbon metabolism.",
+  "1,5-Anhydro-sorbitol": "A sugar-related metabolite associated with glucose handling in the body.",
+  "Fructose": "A simple sugar used in carbohydrate and energy metabolism.",
+  "Galactose": "A simple sugar that enters carbohydrate metabolism after processing in the body.",
+  "Glucose": "The main circulating blood sugar and a major source of cellular energy.",
+  "Mannose": "A simple sugar involved in carbohydrate and glycoprotein metabolism.",
+  "Tyrosine": "An amino acid used to make proteins and several signaling molecules.",
+  "Allonic acid": "A sugar-acid-related metabolite detected in metabolic profiling.",
+  "α-D-Galactopyranose": "A structural form of the simple sugar galactose.",
+  "Palmitelaidic acid": "A trans-monounsaturated fatty acid involved in lipid metabolism.",
+  "Palmitic acid": "A common saturated fatty acid and component of body lipids.",
+  "Myo-Inositol": "A sugar-like molecule involved in cell signaling and membrane-related metabolism.",
+  "Uric acid": "The end product of purine breakdown in humans.",
+  "Tryptophan": "An essential amino acid used for protein synthesis and several metabolic pathways.",
+  "Linoleic acid": "An essential polyunsaturated fatty acid used in lipid metabolism.",
+  "Oleic acid": "A monounsaturated fatty acid that is a common component of body lipids.",
+  "Stearic acid": "A common saturated fatty acid involved in lipid metabolism.",
+  "Arachidonic acid": "A polyunsaturated fatty acid used to produce signaling molecules involved in inflammation and other processes."
+};
+const PD={"female": {"roc": [[0.0, 0.0], [0.007, 0.0], [0.007, 0.011], [0.014, 0.011], [0.014, 0.045], [0.015, 0.056], [0.018, 0.067], [0.025, 0.067], [0.025, 0.079], [0.029, 0.09], [0.04, 0.09], [0.04, 0.112], [0.041, 0.124], [0.044, 0.146], [0.047, 0.157], [0.052, 0.18], [0.054, 0.191], [0.055, 0.202], [0.066, 0.202], [0.066, 0.213], [0.067, 0.236], [0.069, 0.247], [0.077, 0.247], [0.077, 0.258], [0.081, 0.27], [0.085, 0.292], [0.091, 0.303], [0.112, 0.303], [0.112, 0.326], [0.124, 0.326], [0.124, 0.337], [0.131, 0.337], [0.154, 0.337], [0.154, 0.36], [0.156, 0.371], [0.164, 0.371], [0.164, 0.382], [0.165, 0.393], [0.168, 0.404], [0.191, 0.404], [0.191, 0.416], [0.193, 0.427], [0.207, 0.427], [0.207, 0.438], [0.22, 0.438], [0.22, 0.449], [0.225, 0.461], [0.236, 0.461], [0.236, 0.472], [0.242, 0.472], [0.244, 0.483], [0.245, 0.506], [0.248, 0.528], [0.253, 0.539], [0.267, 0.539], [0.267, 0.573], [0.277, 0.573], [0.277, 0.584], [0.28, 0.596], [0.281, 0.607], [0.282, 0.618], [0.291, 0.618], [0.291, 0.629], [0.292, 0.64], [0.313, 0.64], [0.313, 0.663], [0.336, 0.663], [0.336, 0.674], [0.339, 0.685], [0.34, 0.697], [0.355, 0.697], [0.355, 0.708], [0.358, 0.719], [0.361, 0.73], [0.368, 0.73], [0.368, 0.742], [0.397, 0.742], [0.397, 0.753], [0.438, 0.753], [0.438, 0.764], [0.441, 0.775], [0.449, 0.775], [0.449, 0.787], [0.46, 0.787], [0.46, 0.809], [0.47, 0.809], [0.47, 0.82], [0.486, 0.82], [0.486, 0.831], [0.497, 0.831], [0.497, 0.843], [0.583, 0.843], [0.583, 0.854], [0.602, 0.854], [0.602, 0.865], [0.606, 0.876], [0.624, 0.876], [0.624, 0.899], [0.645, 0.899], [0.645, 0.91], [0.657, 0.91], [0.657, 0.921], [0.682, 0.921], [0.682, 0.933], [0.731, 0.933], [0.731, 0.955], [0.736, 0.978], [0.788, 0.978], [0.788, 0.989], [0.807, 0.989], [0.807, 1.0], [0.876, 1.0], [1.0, 1.0]], "pr": [[0.011, 0.167], [0.011, 0.143], [0.011, 0.125], [0.011, 0.111], [0.011, 0.1], [0.011, 0.091], [0.022, 0.167], [0.034, 0.231], [0.045, 0.286], [0.045, 0.267], [0.056, 0.312], [0.056, 0.294], [0.056, 0.278], [0.067, 0.316], [0.067, 0.3], [0.067, 0.286], [0.067, 0.273], [0.067, 0.25], [0.079, 0.28], [0.079, 0.259], [0.079, 0.25], [0.09, 0.276], [0.09, 0.267], [0.09, 0.258], [0.09, 0.25], [0.09, 0.242], [0.09, 0.235], [0.09, 0.229], [0.09, 0.222], [0.09, 0.216], [0.101, 0.237], [0.112, 0.256], [0.112, 0.25], [0.124, 0.268], [0.124, 0.262], [0.124, 0.256], [0.135, 0.273], [0.146, 0.289], [0.146, 0.283], [0.146, 0.277], [0.157, 0.292], [0.157, 0.28], [0.157, 0.269], [0.169, 0.283], [0.18, 0.296], [0.191, 0.304], [0.202, 0.31], [0.202, 0.3], [0.202, 0.29], [0.202, 0.281], [0.202, 0.273], [0.213, 0.284], [0.225, 0.29], [0.236, 0.3], [0.247, 0.306], [0.247, 0.297], [0.247, 0.289], [0.247, 0.282], [0.258, 0.291], [0.258, 0.284], [0.27, 0.289], [0.27, 0.282], [0.281, 0.287], [0.292, 0.295], [0.292, 0.289], [0.292, 0.283], [0.303, 0.29], [0.303, 0.284], [0.303, 0.276], [0.303, 0.267], [0.303, 0.26], [0.303, 0.252], [0.315, 0.257], [0.326, 0.264], [0.326, 0.257], [0.326, 0.25], [0.326, 0.244], [0.337, 0.25], [0.337, 0.244], [0.337, 0.236], [0.337, 0.229], [0.337, 0.222], [0.337, 0.216], [0.348, 0.217], [0.36, 0.222], [0.371, 0.226], [0.371, 0.22], [0.382, 0.222], [0.393, 0.226], [0.404, 0.228], [0.404, 0.221], [0.404, 0.214], [0.404, 0.208], [0.416, 0.21], [0.427, 0.213], [0.427, 0.207], [0.438, 0.206], [0.438, 0.2], [0.449, 0.2], [0.461, 0.201], [0.461, 0.194], [0.472, 0.197], [0.483, 0.195], [0.494, 0.198], [0.506, 0.202], [0.517, 0.204], [0.528, 0.207], [0.539, 0.207], [0.539, 0.201], [0.551, 0.202], [0.562, 0.205], [0.573, 0.208], [0.584, 0.206], [0.596, 0.207], [0.607, 0.209], [0.618, 0.212], [0.629, 0.21], [0.64, 0.212], [0.64, 0.206], [0.652, 0.204], [0.663, 0.206], [0.663, 0.2], [0.674, 0.197], [0.685, 0.199], [0.697, 0.201], [0.697, 0.194], [0.708, 0.196], [0.719, 0.198], [0.73, 0.199], [0.742, 0.198], [0.742, 0.192], [0.753, 0.189], [0.753, 0.183], [0.753, 0.176], [0.764, 0.176], [0.775, 0.177], [0.787, 0.177], [0.798, 0.175], [0.809, 0.177], [0.82, 0.176], [0.831, 0.173], [0.843, 0.172], [0.843, 0.166], [0.843, 0.16], [0.843, 0.154], [0.854, 0.152], [0.865, 0.15], [0.876, 0.151], [0.888, 0.148], [0.899, 0.15], [0.91, 0.148], [0.921, 0.147], [0.933, 0.144], [0.933, 0.137], [0.944, 0.137], [0.955, 0.138], [0.966, 0.139], [0.978, 0.14], [0.978, 0.134], [0.989, 0.133], [1.0, 0.132], [1.0, 0.126], [1.0, 0.12], [1.0, 0.114], [1.0, 0.109]], "cm": [[484, 242], [30, 59]], "auc": 0.724, "prev": 0.109, "imp": [["numeric__RIDAGEYR", 0.0374, 1], ["categorical__DMDMARTL_5.0", 0.0283, 1], ["categorical__DMDMARTL_1.0", 0.022, 1], ["categorical__RIDRETH3_3.0", 0.0136, 1], ["numeric__INDFMPIR", 0.0134, 1], ["categorical__DMDEDUC2_1.0", 0.0109, 1], ["categorical__RHQ078_2.0", 0.0084, 1], ["categorical__RHQ078_1.0", 0.0075, 1], ["categorical__RHQ131_1.0", 0.0056, 1], ["categorical__DMDEDUC2_5.0", 0.0053, 1], ["categorical__RHQ131_2.0", 0.0045, 1], ["categorical__RIDRETH3_1.0", 0.0036, 1], ["categorical__RHQ172_1.0", 0.0029, 1], ["categorical__DMDEDUC2_3.0", 0.0027, 1], ["categorical__RIDRETH3_4.0", 0.0024, 1]]}, "male": {"roc": [[0.0, 0.0], [0.0, 0.012], [0.0, 0.929], [0.103, 0.929], [0.103, 0.94], [0.138, 0.94], [0.138, 0.988], [0.483, 0.988], [0.483, 1.0], [1.0, 1.0]], "pr": [[0.012, 1.0], [0.024, 1.0], [0.036, 1.0], [0.048, 1.0], [0.06, 1.0], [0.071, 1.0], [0.083, 1.0], [0.095, 1.0], [0.107, 1.0], [0.119, 1.0], [0.131, 1.0], [0.143, 1.0], [0.155, 1.0], [0.167, 1.0], [0.179, 1.0], [0.19, 1.0], [0.202, 1.0], [0.214, 1.0], [0.226, 1.0], [0.238, 1.0], [0.25, 1.0], [0.262, 1.0], [0.274, 1.0], [0.286, 1.0], [0.298, 1.0], [0.31, 1.0], [0.321, 1.0], [0.333, 1.0], [0.345, 1.0], [0.357, 1.0], [0.369, 1.0], [0.381, 1.0], [0.393, 1.0], [0.405, 1.0], [0.417, 1.0], [0.429, 1.0], [0.44, 1.0], [0.452, 1.0], [0.464, 1.0], [0.476, 1.0], [0.488, 1.0], [0.5, 1.0], [0.512, 1.0], [0.524, 1.0], [0.536, 1.0], [0.548, 1.0], [0.56, 1.0], [0.571, 1.0], [0.583, 1.0], [0.595, 1.0], [0.607, 1.0], [0.619, 1.0], [0.631, 1.0], [0.643, 1.0], [0.655, 1.0], [0.667, 1.0], [0.679, 1.0], [0.69, 1.0], [0.702, 1.0], [0.714, 1.0], [0.726, 1.0], [0.738, 1.0], [0.75, 1.0], [0.762, 1.0], [0.774, 1.0], [0.786, 1.0], [0.798, 1.0], [0.81, 1.0], [0.821, 1.0], [0.833, 1.0], [0.845, 1.0], [0.857, 1.0], [0.869, 1.0], [0.881, 1.0], [0.893, 1.0], [0.905, 1.0], [0.917, 1.0], [0.929, 1.0], [0.929, 0.987], [0.929, 0.975], [0.929, 0.963], [0.94, 0.963], [0.94, 0.952], [0.952, 0.952], [0.964, 0.953], [0.976, 0.953], [0.988, 0.954], [0.988, 0.943], [0.988, 0.933], [0.988, 0.922], [0.988, 0.912], [0.988, 0.902], [0.988, 0.892], [0.988, 0.883], [0.988, 0.874], [0.988, 0.865], [0.988, 0.856], [1.0, 0.857], [1.0, 0.848], [1.0, 0.84], [1.0, 0.832], [1.0, 0.824], [1.0, 0.816], [1.0, 0.808], [1.0, 0.8], [1.0, 0.792], [1.0, 0.785], [1.0, 0.778], [1.0, 0.771], [1.0, 0.764], [1.0, 0.757], [1.0, 0.75], [1.0, 0.743]], "cm": [[29, 0], [6, 78]], "auc": 0.986, "prev": 0.743, "imp": [["Stearic acid", 2.532, 1], ["Ribitol", 1.847, -1], ["Fumarate", 1.753, -1], ["Serine", 1.664, 1], ["Proline", 1.573, 1], ["Isoleucine", 1.508, 1], ["1,5-Anhydro-sorbitol", 1.355, 1], ["Citrate", 1.254, -1], ["Phosphoric acid", 1.039, -1], ["Hypoxanthine", 1.026, 1], ["Tryptophan", 0.93, 1], ["Uric acid", 0.916, 1], ["2,3,4-Trihydroxybutyric acid", 0.909, -1], ["Palmitic acid", 0.843, 1], ["Valine", 0.809, 1]], "coef": [["Stearic acid", 3.066], ["Isoleucine", 2.316], ["Serine", 2.161], ["Proline", 1.949], ["1,5-Anhydro-sorbitol", 1.724], ["Hypoxanthine", 1.286], ["Uric acid", 1.18], ["Tryptophan", 1.154], ["Palmitic acid", 1.135], ["Valine", 0.951], ["Threonine", 0.825], ["Arachidonic acid", 0.511], ["Linoleic acid", -0.543], ["Myo-Inositol", -0.7], ["\u03b1-hydroxybutyrate", -0.79], ["2,3,4-Trihydroxybutyric acid", -1.14], ["Phosphoric acid", -1.39], ["Citrate", -1.683], ["Fumarate", -2.254], ["Ribitol", -2.804]]}};
+const EXTRA={"fem": {"ROC_AUC": [0.724, 0.672, 0.772], "PR_AUC": [0.217, 0.165, 0.294], "Sensitivity": [0.663, 0.561, 0.759], "Specificity": [0.667, 0.631, 0.701], "Precision": [0.196, 0.151, 0.242], "F1": [0.303, 0.241, 0.361], "Balanced_Accuracy": [0.665, 0.611, 0.716]}, "femPerm": [0.5, 0.001], "thr": [[0.3, 0.98, 0.136, 0.123], [0.4, 0.909, 0.305, 0.139], [0.5, 0.651, 0.598, 0.166], [0.52, 0.572, 0.68, 0.181], [0.6, 0.209, 0.899, 0.204], [0.65, 0.032, 0.99, 0.286]], "grp": [["AS", 52, 0.934, 0.832, 1.0, 0.826, 0.001], ["AZ", 49, 0.962, 0.873, 1.0, 0.85, 0.001], ["OL", 49, 0.96, 0.894, 1.0, 0.75, 0.001], ["TE", 50, 0.995, 0.979, 1.0, 0.857, 0.001]], "dca": {"female": {"t": [0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.2, 0.21, 0.22, 0.23, 0.24, 0.25, 0.26, 0.27, 0.28, 0.29, 0.3, 0.31, 0.32, 0.33, 0.34, 0.35, 0.36, 0.37, 0.38, 0.39, 0.4, 0.41, 0.42, 0.43, 0.44, 0.45, 0.46, 0.47, 0.48, 0.49, 0.5, 0.51, 0.52, 0.53, 0.54, 0.55, 0.56, 0.57, 0.58, 0.59, 0.6, 0.61, 0.62, 0.63, 0.64, 0.65, 0.66, 0.67, 0.68, 0.69], "m": [0.0623, 0.0523, 0.0422, 0.0317, 0.0211, 0.0102, -0.0009, -0.0123, -0.0239, -0.0358, -0.048, -0.0605, -0.073, -0.0855, -0.0974, -0.1104, -0.1234, -0.1341, -0.1455, -0.1562, -0.1677, -0.1792, -0.1903, -0.199, -0.208, -0.2131, -0.2204, -0.2297, -0.2431, -0.2529, -0.2626, -0.2742, -0.2802, -0.296, -0.3077, -0.3162, -0.3172, -0.3235, -0.3221, -0.3297, -0.3256, -0.324, -0.3204, -0.3023, -0.2915, -0.2773, -0.2547, -0.2493, -0.2303, -0.2286, -0.2147, -0.1989, -0.1807, -0.1513, -0.1081, -0.0687, -0.0538, -0.047, -0.0261, -0.0184, -0.0147, -0.0107, -0.0125, -0.0078, -0.0055], "a": [0.0623, 0.0523, 0.0422, 0.0317, 0.0211, 0.0102, -0.0009, -0.0123, -0.0239, -0.0358, -0.048, -0.0605, -0.0733, -0.0863, -0.0998, -0.1135, -0.1276, -0.142, -0.1569, -0.1721, -0.1877, -0.2038, -0.2203, -0.2372, -0.2546, -0.2726, -0.291, -0.31, -0.3295, -0.3497, -0.3705, -0.3919, -0.414, -0.4368, -0.4603, -0.4847, -0.5098, -0.5359, -0.5628, -0.5907, -0.6196, -0.6496, -0.6808, -0.7131, -0.7467, -0.7816, -0.818, -0.8558, -0.8953, -0.9365, -0.9796, -1.0245, -1.0716, -1.1209, -1.1727, -1.227, -1.2841, -1.3442, -1.4076, -1.4744, -1.5451, -1.62, -1.6994, -1.7837, -1.8735]}, "male": {"t": [0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.17, 0.18, 0.19, 0.2, 0.21, 0.22, 0.23, 0.24, 0.25, 0.26, 0.27, 0.28, 0.29, 0.3, 0.31, 0.32, 0.33, 0.34, 0.35, 0.36, 0.37, 0.38, 0.39, 0.4, 0.41, 0.42, 0.43, 0.44, 0.45, 0.46, 0.47, 0.48, 0.49, 0.5, 0.51, 0.52, 0.53, 0.54, 0.55, 0.56, 0.57, 0.58, 0.59, 0.6, 0.61, 0.62, 0.63, 0.64, 0.65, 0.66, 0.67, 0.68, 0.69, 0.7, 0.71, 0.72, 0.73, 0.74, 0.75, 0.76, 0.77, 0.78, 0.79, 0.8, 0.81, 0.82, 0.83, 0.84, 0.85, 0.86, 0.87, 0.88, 0.89, 0.9, 0.91, 0.92, 0.93, 0.94, 0.95], "m": [0.7299, 0.73, 0.7292, 0.7284, 0.7284, 0.7286, 0.729, 0.7297, 0.7292, 0.7199, 0.7194, 0.7189, 0.7184, 0.7179, 0.7085, 0.708, 0.7074, 0.7068, 0.7062, 0.7056, 0.705, 0.7044, 0.7037, 0.703, 0.7024, 0.6928, 0.6832, 0.6825, 0.6817, 0.6809, 0.6848, 0.6842, 0.6835, 0.674, 0.6733, 0.6726, 0.6718, 0.671, 0.6702, 0.6694, 0.6685, 0.6676, 0.6746, 0.6739, 0.6733, 0.6726, 0.6718, 0.6711, 0.6703, 0.6695, 0.6686, 0.6677, 0.6668, 0.6658, 0.6648, 0.6637, 0.6764, 0.6758, 0.6903, 0.6903, 0.6814, 0.6726, 0.6726, 0.6726, 0.6726, 0.6726, 0.6726, 0.6726, 0.6726, 0.6726, 0.6726, 0.6726, 0.6549, 0.6549, 0.646, 0.6372, 0.6372, 0.6372, 0.6372, 0.6372, 0.6372, 0.6372, 0.6372, 0.6372, 0.6372, 0.6283, 0.6283, 0.6106, 0.6018, 0.6018, 0.6018], "a": [0.7299, 0.727, 0.724, 0.721, 0.718, 0.7148, 0.7116, 0.7084, 0.705, 0.7016, 0.6981, 0.6945, 0.6908, 0.687, 0.6832, 0.6792, 0.6751, 0.671, 0.6667, 0.6623, 0.6578, 0.6532, 0.6484, 0.6436, 0.6385, 0.6334, 0.6281, 0.6226, 0.617, 0.6112, 0.6052, 0.599, 0.5926, 0.5861, 0.5793, 0.5723, 0.565, 0.5575, 0.5498, 0.5417, 0.5334, 0.5247, 0.5158, 0.5065, 0.4968, 0.4867, 0.4763, 0.4653, 0.454, 0.4421, 0.4297, 0.4167, 0.4032, 0.389, 0.3741, 0.3584, 0.342, 0.3246, 0.3064, 0.2871, 0.2668, 0.2452, 0.2223, 0.198, 0.1721, 0.1445, 0.115, 0.0834, 0.0495, 0.0129, -0.0265, -0.0693, -0.1158, -0.1665, -0.2221, -0.2832, -0.3507, -0.4258, -0.5096, -0.604, -0.7109, -0.8331, -0.9741, -1.1386, -1.3331, -1.5664, -1.8515, -2.208, -2.6662, -3.2773, -4.1327]}}};
+
+const $=id=>document.getElementById(id);
+/* ---------- generated artwork (procedural SVG) ---------- */
+function art(seed,c1,c2){
+  let s=seed*9301+49297;const r=()=>(s=(s*9301+49297)%233280)/233280;
+  const W=800,H=220,pts=Array.from({length:22},()=>[r()*W,r()*H,2+r()*5]);
+  let g=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="a${seed}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient><radialGradient id="b${seed}"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><rect width="${W}" height="${H}" fill="url(#a${seed})"/>`;
+  for(let i=0;i<3;i++)g+=`<circle cx="${r()*W}" cy="${r()*H}" r="${70+r()*90}" fill="url(#b${seed})"/>`;
+  pts.forEach((p,i)=>pts.slice(i+1).forEach(q=>{const d=Math.hypot(p[0]-q[0],p[1]-q[1]);if(d<140)g+=`<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke="#fff" stroke-opacity="${(.4-d/400).toFixed(2)}"/>`}));
+  pts.forEach(p=>g+=`<circle cx="${p[0]}" cy="${p[1]}" r="${p[2]}" fill="#fff" fill-opacity=".75"/><circle cx="${p[0]}" cy="${p[1]}" r="${p[2]*2.6}" fill="none" stroke="#fff" stroke-opacity=".25"/>`);
+  return g+`</svg>`;
+}
+const ARTS={1:[3,"#0b3a8c","#0d9488"],2:[7,"#312e81","#2563eb"],3:[11,"#0f4c5c","#0d9488"],4:[19,"#1e3a8a","#7c3aed"],5:[23,"#0f3d6e","#0891b2"]};
+const I_CAL='<svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>',I_CH='<svg viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg>',I_DROP='<svg viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg>';
+const FI={RIDAGEYR:I_CAL,RHQ010:I_CAL};
+function cellArt(vb,par){
+  const sp='<path d="M-12 0C-40-14-60 14-90 0S-140-8-175 4" fill="none" stroke="#8db8f3" stroke-width="3.5" stroke-linecap="round"/><ellipse rx="15" ry="10" fill="#5b95ea"/><ellipse cx="-3" cy="-3" rx="8" ry="4" fill="#fff" opacity=".4"/>';
+  return `<svg viewBox="${vb||"0 0 800 220"}" preserveAspectRatio="${par||"xMaxYMid meet"}" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="ceg" cx=".38" cy=".32" r=".85"><stop offset="0" stop-color="#f1f7ff"/><stop offset=".6" stop-color="#a9ccfb"/><stop offset="1" stop-color="#5b95ea"/></radialGradient><radialGradient id="cnu" cx=".4" cy=".35"><stop offset="0" stop-color="#9bc2f7"/><stop offset="1" stop-color="#3f78d8"/></radialGradient></defs>
+  <circle cx="690" cy="112" r="106" fill="#fff" opacity=".4"/><circle cx="690" cy="112" r="93" fill="#fff" opacity=".5"/><circle cx="690" cy="112" r="80" fill="url(#ceg)"/><circle cx="676" cy="104" r="44" fill="url(#cnu)" opacity=".8"/>
+  ${[[660,90,7],[690,118,9],[672,128,5],[700,92,5],[655,112,4]].map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" opacity=".35"/>`).join("")}
+  <g transform="translate(560 150) rotate(-14)">${sp}</g><g transform="translate(520 62) rotate(10) scale(.8)">${sp}</g></svg>`;
+}
+document.querySelectorAll("[data-art]").forEach(e=>e.innerHTML=cellArt());
+$("sart").innerHTML=cellArt("430 0 370 220","xMidYMid meet");
+
+/* ---------- navigation: each item opens its own view ---------- */
+const IC={
+predict:'<path d="M3 12h4l3-8 4 16 3-8h4"/>',
+perf:'<path d="M3 17l5-6 4 4 8-9"/><path d="M14 6h6v6"/>',
+terms:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01"/>',
+model:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+dca:'<path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/>'};
+const VIEWS=[["predict","Prediction"],["model","Model Information"],["terms","What Do These Terms Mean?"],["perf","Model Performance"],["dca","Decision Analysis"]];
+const nav=document.getElementById("nav");
+VIEWS.forEach(([id,t])=>nav.insertAdjacentHTML("beforeend",`<a href="#${id}" data-v="${id}"><span class="ic"><svg viewBox="0 0 24 24">${IC[id]}</svg></span>${t}</a>`));
+function route(){
+  const h=(location.hash||"#predict").slice(1);const v=VIEWS.some(x=>x[0]===h)?h:"predict";
+  document.querySelectorAll(".view").forEach(e=>e.classList.toggle("on",e.id==="v-"+v));
+  nav.querySelectorAll("a").forEach(a=>a.classList.toggle("on",a.dataset.v===v));
+  window.scrollTo(0,0);
+}
+addEventListener("hashchange",route);
+
+/* ---------- helpers ---------- */
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+const yn=[["1","Yes"],["2","No"]];
+const FEMALE_UI={
+RIDAGEYR:["Age (years)","e.g. 28"],INDFMPIR:["Income-to-poverty ratio","e.g. 2.5"],RHQ010:["Age at first period (years)","e.g. 12"],
+RIDRETH3:["Race / ethnicity",[["1","Mexican American"],["2","Other Hispanic"],["3","Non-Hispanic White"],["4","Non-Hispanic Black"],["6","Non-Hispanic Asian"],["7","Other / multiracial"]]],
+DMDEDUC2:["Education",[["1","Less than 9th grade"],["2","9–11th grade"],["3","High school / GED"],["4","Some college / AA"],["5","College graduate or above"]]],
+DMDMARTL:["Marital status",[["1","Married"],["2","Widowed"],["3","Divorced"],["4","Separated"],["5","Never married"],["6","Living with partner"]]],
+RHQ031:["Period in past 12 months",yn],RHQ078:["Ever treated for pelvic infection (PID)",yn],
+RHQ131:["Ever been pregnant",yn],RHQ172:["Baby weighing 9 lb or more",yn]};
+function buildFields(){
+  $("femaleFields").innerHTML=FEMALE_FEATURES.map(f=>{const [l,o]=FEMALE_UI[f];
+    const ctl=Array.isArray(o)?`<select id="${f}"><option value="">Select…</option>${o.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join("")}</select>`
+      :`<div class="in"><input id="${f}" type="number" step="any" placeholder="${o}">${FI[f]||I_CH}</div>`;
+    return `<div><label>${l} <i>${f}</i></label>${ctl}</div>`}).join("");
+  $("maleFields").innerHTML=MALE_FEATURES.map((n,i)=>`<div title="${escapeHtml(MALE_FEATURE_MEANINGS[n]||"")}"><label>${i+1}. ${escapeHtml(n)}</label><div class="in"><input id="male_${i}" type="number" step="any" placeholder="0.00">${I_DROP}</div></div>`).join("");
+}
+function getFemaleFeatures(){const o={};FEMALE_FEATURES.forEach(f=>{const v=$(f).value;o[f]=v===""?null:Number(v)});return o}
+function getMaleFeatures(){const o={};MALE_FEATURES.forEach((f,i)=>{const v=$("male_"+i).value;o[f]=v===""?null:Number(v)});return o}
+const parseValues=t=>t.split(/[\n,\t;]+/).map(x=>x.trim()).filter(Boolean);
+function fillFemaleFromPaste(){const v=parseValues($("femalePaste").value);FEMALE_FEATURES.forEach((f,i)=>{if(v[i]!==undefined)$(f).value=v[i]})}
+function fillMaleFromPaste(){const v=parseValues($("malePaste").value);MALE_FEATURES.forEach((f,i)=>{if(v[i]!==undefined)$("male_"+i).value=v[i]})}
+function loadSampleFemale(){$("femalePaste").value="33, 2.85, 13, 3, 4, 1, 1, 2, 1, 2";fillFemaleFromPaste()}
+function loadSampleMale(){$("malePaste").value=Array.from({length:50},(_,i)=>Number((0.15+((i*7)%19)*0.04).toFixed(3))).join(", ");fillMaleFromPaste()}
+const validate=f=>Object.values(f).every(v=>v!==null&&Number.isFinite(v));
+
+/* ---------- prediction ---------- */
+let current="female";
+function placeholder(){const r=$("result");r.innerHTML="";r.style.display="none"}
+function showRes(h,cls){const r=$("result");r.className="resbox"+(cls?" "+cls:"");r.innerHTML=h;r.style.display="block"}
+async function predict(model){
+  const features=model==="female"?getFemaleFeatures():getMaleFeatures();
+  if(!validate(features)){alert("Please provide values for all required features.");return}
+  showRes(`<div class="rh"><b>Calculating…</b></div>`);
+  try{
+    const r=await fetch(`${API_BASE}/api/predict/${model}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({features})});
+    if(!r.ok)throw new Error("Prediction API returned HTTP "+r.status);
+    renderResult(await r.json(),model);
+  }catch(e){
+    showRes(`<div class="rh"><b>Prediction service not connected</b></div><div class="hint">Start the app with RUN_INFERTILITY_APP.bat, then try again. (${escapeHtml(e.message)})</div>`,"hi");console.error(e);
+  }
+  const r=$("result");if(r.scrollIntoView)r.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function featLabel(f){
+  const k=FEMALE_FEATURES.find(c=>String(f).includes(c));if(!k)return escapeHtml(f);
+  const m=String(f).match(/_(\d+)\.0$/),u=FEMALE_UI[k];let l="";
+  if(m){const o=Array.isArray(u[1])?u[1].find(x=>x[0]===m[1]):null;l=": "+(o?o[1]:m[1])}
+  return escapeHtml(u[0].replace(/ \(years\)/,"")+l);
+}
+function renderResult(d,model){
+  const p=Number(d.probability),t=Number(d.threshold??MODEL_INFO[model].threshold),pos=Number(d.prediction)===1||p>=t;
+  const c=2*Math.PI*52,col=pos?"#e11d48":"#0d9488";
+  let bars="";
+  if(Array.isArray(d.shap)&&d.shap.length){
+    const it=[...d.shap].sort((a,b)=>Math.abs(b.contribution)-Math.abs(a.contribution)).slice(0,8);
+    const mx=Math.max(...it.map(x=>Math.abs(Number(x.contribution))),1e-9);
+    bars=`<div class="sbars"><h4>Top Contributing Features (SHAP)</h4>${it.map(x=>{const v=Number(x.contribution);
+      return `<div class="sb ${v>=0?"p":"n"}"><span>${model==="female"?featLabel(x.feature):escapeHtml(x.feature)}</span><div class="t"><i style="width:${Math.max(4,Math.abs(v)/mx*100)}%"></i></div><b>${v>=0?"+":""}${v.toFixed(2)}</b></div>`}).join("")}<div class="hint">Blue raises the predicted risk; pink lowers it.</div></div>`;
+  }
+  showRes(`<div class="rh"><span class="ck">✓</span><b>Prediction Result</b><span class="chip2">${model==="female"?"Female Model · Population Level":"Male Model · Metabolomic Level"}</span></div>
+  <div class="rg"><div class="dn"><svg viewBox="0 0 140 140"><circle cx="70" cy="70" r="52" fill="none" stroke="#d9e4f3" stroke-width="12"/><circle cx="70" cy="70" r="52" fill="none" stroke="${col}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${c*Math.min(1,p)} ${c}" transform="rotate(-90 70 70)"/><text x="70" y="78" text-anchor="middle" font-size="24" font-weight="800" fill="#0f1b2d">${(p*100).toFixed(1)}%</text></svg><span>Probability of Infertility</span></div>
+  <div class="oc"><div><small>Predicted Outcome</small><b>${pos?"Higher Risk":"Lower Risk"}</b><small>Probability ${pos?"at or above":"below"} decision threshold (${t.toFixed(2)})</small></div></div>${bars}</div>`,pos?"hi":"");
+}
+function clearForm(model){
+  if(model==="female"){FEMALE_FEATURES.forEach(f=>$(f).value="");$("femalePaste").value=""}
+  else{MALE_FEATURES.forEach((f,i)=>$("male_"+i).value="");$("malePaste").value=""}
+  placeholder();
+}
+$("seg").addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;current=b.dataset.model;
+  $("seg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));
+  $("femalePanel").style.display=current==="female"?"":"none";
+  $("malePanel").style.display=current==="male"?"":"none";
+  placeholder();
+});
+
+/* ---------- info views ---------- */
+const NAMES={female:"Female · Population-level",male:"Male · Metabolomic"};
+function ci(v){return `${v[0].toFixed(3)}<small>95% CI ${v[1].toFixed(3)}–${v[2].toFixed(3)}</small>`}
+function rowsHtml(a){return a.map(([l,v])=>`<div class="ir"><span>${l}</span><b>${v}</b></div>`).join("")}
+function buildInfo(){
+  const F=EXTRA.fem,fm=MODEL_INFO.female,mm=MODEL_INFO.male;
+  const fCard=`<div class="card"><div class="ch"><div><h3>${NAMES.female}</h3><p>Held-out test set, n = 815 (89 cases) · bootstrap CIs, 5,000 resamples</p></div><span class="tag">Threshold ${fm.threshold}</span></div>
+  ${rowsHtml([["Algorithm",fm.model],["Input features",fm.features],["ROC-AUC",ci(F.ROC_AUC)],["PR-AUC",ci(F.PR_AUC)],["Sensitivity",ci(F.Sensitivity)],["Specificity",ci(F.Specificity)],["Precision",ci(F.Precision)],["F1-score",ci(F.F1)],["Permutation test",`AUC under shuffled labels ${EXTRA.femPerm[0].toFixed(3)}<small>p = ${EXTRA.femPerm[1]}</small>`]])}
+  <div class="sub">Limitations</div><ul class="lim">
+  <li>Precision is about 0.20, roughly twice the 10.9% prevalence: around 4 in 5 flagged participants are false positives.</li>
+  <li>Moving the threshold does not fix this: at 0.65 precision rises to 0.29 but sensitivity falls to 0.03 (table below).</li>
+  <li>Decision curve shows no net benefit over treating everyone or no one (see Decision analysis).</li>
+  <li>Signal is real (p ≈ 0.001) but modest: a screening-level result from 10 survey variables, not a diagnostic tool.</li></ul></div>`;
+  const mCard=`<div class="card"><div class="ch"><div><h3>${NAMES.male}</h3><p>Out-of-fold, n = 113 (84 cases, 29 controls)</p></div><span class="tag">Threshold ${mm.threshold}</span></div>
+  ${rowsHtml([["Algorithm",mm.model],["Input features",mm.features+" (L1 selects 33)"],["ROC-AUC",mm.roc],["PR-AUC",mm.pr],["Sensitivity",mm.sensitivity],["Specificity",mm.specificity],["F1-score",mm.f1],["Held-out subgroup AUC","0.934–0.995<small>mean 0.963</small>"]])}
+  <div class="sub">Limitations</div><ul class="lim">
+  <li>Small case-control sample (74% cases): predictive values will not carry over to a real population.</li>
+  <li>L1 feature selection runs inside each fold, but the 0.63 threshold was chosen on the same out-of-fold predictions, so headline figures are somewhat optimistic.</li>
+  <li>On unseen diagnostic subgroups AUC stays high but sensitivity drops to 0.75–0.86 (table below).</li>
+  <li>No external validation: treat this as hypothesis-generating.</li></ul></div>`;
+  $("modelCards").innerHTML=fCard+mCard;
+  const tr=EXTRA.thr.map(r=>`<tr class="${r[0]===0.52?"hl":""}"><td>${r[0].toFixed(2)}</td><td>${r[1].toFixed(3)}</td><td>${r[2].toFixed(3)}</td><td>${r[3].toFixed(3)}</td></tr>`).join("");
+  const gr=EXTRA.grp.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2].toFixed(3)} <small style="color:#64748b">(${r[3].toFixed(2)}–${r[4].toFixed(2)})</small></td><td>${r[5].toFixed(2)}</td><td>${r[6]}</td></tr>`).join("");
+  $("modelTables").innerHTML=`<div class="card"><div class="ch"><div><h3>Female · threshold trade-off</h3><p>Validation set. Highlighted row is the operating threshold.</p></div></div><table class="tb"><tr><th>Threshold</th><th>Sensitivity</th><th>Specificity</th><th>Precision</th></tr>${tr}</table></div>
+  <div class="card"><div class="ch"><div><h3>Male · held-out subgroup test</h3><p>Train without one diagnostic subgroup, then test on it. 1,000 permutations each.</p></div></div><table class="tb"><tr><th>Group</th><th>n</th><th>AUC (95% CI)</th><th>Sens.</th><th>p</th></tr>${gr}</table></div>`;
+  buildDca();
+}
+function dcaSvg(k){
+  const D=EXTRA.dca[k],W=560,H=300,L=46,R=14,T=12,B=34,yl=k==="female"?[-0.4,0.1]:[-0.4,0.8],xl=[0.05,D.t[D.t.length-1]];
+  const X=v=>L+(v-xl[0])/(xl[1]-xl[0])*(W-L-R),Y=v=>T+(yl[1]-Math.min(yl[1],Math.max(yl[0],v)))/(yl[1]-yl[0])*(H-T-B);
+  const line=(a,c,dash)=>`<polyline fill="none" stroke="${c}" stroke-width="2.4" ${dash?`stroke-dasharray="${dash}"`:""} points="${D.t.map((t,i)=>X(t)+","+Y(a[i])).join(" ")}"/>`;
+  const yt=[];for(let v=yl[0];v<=yl[1]+1e-9;v+=0.1)yt.push(+v.toFixed(1));
+  const xt=[];for(let v=0.1;v<=xl[1]+1e-9;v+=0.1)xt.push(+v.toFixed(1));
+  const th=Number(DCA[k].threshold);
+  return `<svg viewBox="0 0 ${W} ${H}" font-size="11" fill="#64748b">${yt.map(v=>`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="${v===0?"#94a3b8":"#e8edf3"}"/><text x="${L-6}" y="${Y(v)+4}" text-anchor="end">${v.toFixed(1)}</text>`).join("")}
+  ${xt.map(v=>`<text x="${X(v)}" y="${H-14}" text-anchor="middle">${v.toFixed(1)}</text>`).join("")}
+  <text x="${(L+W-R)/2}" y="${H-1}" text-anchor="middle">Threshold probability</text>
+  <line x1="${X(th)}" x2="${X(th)}" y1="${T}" y2="${H-B}" stroke="#0f1b2d" stroke-dasharray="3 4"/><text x="${X(th)+5}" y="${T+11}" fill="#0f1b2d">validated ${th}</text>
+  ${line(D.a,"#f59e0b","6 5")}<line x1="${L}" x2="${W-R}" y1="${Y(0)}" y2="${Y(0)}" stroke="#94a3b8" stroke-width="2.4" stroke-dasharray="2 4"/>${line(D.m,"#2563eb")}</svg>`;
+}
+function buildDca(){
+  const verdict={female:`<span class="chip bad">Never beats treat-all or treat-none (0 of 99 thresholds)</span>`,male:`<span class="chip good">Beats both defaults at 96 of 99 thresholds</span>`};
+  $("dcaCards").innerHTML=["female","male"].map(k=>{const d=DCA[k];
+    return `<div class="card dca"><div class="ch"><div><h3>${NAMES[k]}</h3><p>Net benefit across thresholds (axis clipped for readability)</p></div></div>${verdict[k]}
+    <div class="lg" style="margin-top:12px"><span><i style="background:#2563eb"></i>Model</span><span><i style="background:#f59e0b"></i>Treat all</span><span><i style="background:#94a3b8"></i>Treat none</span></div>${dcaSvg(k)}
+    ${rowsHtml([["Model at "+d.threshold,d.model],["Treat all",d.all],["Treat none",d.none]])}</div>`}).join("");
+}
+
+/* ---------- service status ---------- */
+fetch(`${API_BASE}/api/health`).then(r=>r.json()).then(h=>{
+  const ok=h.female_model_loaded&&h.male_model_loaded;
+  $("dot").className="dot "+(ok?"ok":"bad");$("apiTxt").textContent=ok?"API Connected":"Model files missing";
+}).catch(()=>{$("dot").className="dot bad";$("apiTxt").textContent="Service offline"});
+
+
+/* ---------- performance gallery (native charts) ---------- */
+const CW=540,CHT=340,T5=[0,.2,.4,.6,.8,1];
+function frame(o){
+  const L=o.L||52,R=16,T=14,B=46,W=CW,H=CHT,X=v=>L+(v-o.xl[0])/(o.xl[1]-o.xl[0])*(W-L-R),Y=v=>T+(o.yl[1]-v)/(o.yl[1]-o.yl[0])*(H-T-B);
+  const s=o.yt.map(v=>`<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="#e8edf3"/><text x="${L-8}" y="${Y(v)+4}" text-anchor="end">${v.toFixed(1)}</text>`).join("")
+   +o.xt.map(v=>`<text x="${X(v)}" y="${H-26}" text-anchor="middle">${v.toFixed(1)}</text>`).join("")
+   +`<text x="${(L+W-R)/2}" y="${H-6}" text-anchor="middle" font-weight="600">${o.xlab}</text><text transform="translate(13 ${(T+H-B)/2}) rotate(-90)" text-anchor="middle" font-weight="600">${o.ylab}</text>`;
+  return {X,Y,s,W,H,L,R,T,B};
+}
+const wrap=(inner,h)=>`<svg viewBox="0 0 ${CW} ${h||CHT}" font-size="11" fill="#64748b" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2563eb" stop-opacity=".28"/><stop offset="1" stop-color="#2563eb" stop-opacity=".02"/></linearGradient></defs>${inner}</svg>`;
+function chip(f,txt){const w=txt.length*6.6+22;return `<rect x="${f.W-f.R-w-8}" y="${f.H-f.B-34}" width="${w}" height="24" rx="12" fill="#eff6ff"/><text x="${f.W-f.R-w/2-8}" y="${f.H-f.B-18}" text-anchor="middle" fill="#1d4ed8" font-weight="700" font-size="12">${txt}</text>`}
+function curve(pts,o,txt,ref){
+  const f=frame(o),p=pts.map((q,i)=>(i?"L":"M")+f.X(q[0]).toFixed(1)+" "+f.Y(q[1]).toFixed(1)).join(""),z=f.Y(o.yl[0]);
+  return wrap(f.s+ref(f)+`<path d="${p}L${f.X(pts[pts.length-1][0]).toFixed(1)} ${z}L${f.X(pts[0][0]).toFixed(1)} ${z}Z" fill="url(#ga)"/><path d="${p}" fill="none" stroke="#2563eb" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>`+chip(f,txt));
+}
+function hbars(items,fmt,L,neg){
+  const vals=items.map(i=>i[1]),lo=Math.min(0,...vals)*(Math.min(0,...vals)<0?1.34:1),hi=Math.max(0,...vals)*1.24,rh=24,H=items.length*rh+44,W=CW+60,R=14;
+  const X=v=>L+(v-lo)/(hi-lo)*(W-L-R);
+  return `<svg viewBox="0 0 ${W} ${H}" font-size="11.5" fill="#475569" xmlns="http://www.w3.org/2000/svg"><line x1="${X(0)}" x2="${X(0)}" y1="4" y2="${H-34}" stroke="#cbd5e1"/>${items.map(([n,v,s],i)=>{
+    const y=8+i*rh,col=(neg?v>=0:s>0)?"#3b82f6":(neg||s<0?"#ec6b9b":"#3b82f6"),x0=Math.min(X(0),X(v)),w=Math.abs(X(v)-X(0)),ar=v<0&&neg;
+    return `<text x="${L-8}" y="${y+12}" text-anchor="end">${n}</text><rect x="${x0}" y="${y+2}" width="${Math.max(2,w)}" height="14" rx="5" fill="${col}"/><text x="${ar?x0-6:x0+w+6}" y="${y+13}" text-anchor="${ar?"end":"start"}" font-weight="600" fill="#334155">${fmt(v)}</text>`}).join("")}
+  <text x="${(L+W)/2}" y="${H-8}" text-anchor="middle" font-weight="600">${neg?"L1 logistic regression coefficient":"Mean absolute SHAP value"}</text></svg>`;
+}
+function cmHtml(m){
+  const rows=[["Actual: No",0],["Actual: Yes",1]],lab=[["TN","FP"],["FN","TP"]];
+  return `<div class="cm"><div></div><div class="h">Predicted: No</div><div class="h">Predicted: Yes</div>`+rows.map(([n,r])=>{const tot=m[r][0]+m[r][1];
+    return `<div class="rl">${n}</div>`+[0,1].map(c=>{const v=m[r][c],p=v/tot,ok=r===c;
+      return `<div class="c" style="background:${ok?`rgba(13,148,136,${.1+.55*p})`:`rgba(225,29,72,${.07+.6*p})`}"><b>${v}</b><span>${lab[r][c]} · ${(p*100).toFixed(1)}% of ${r?"cases":"non-cases"}</span></div>`}).join("")}).join("")+`</div>`;
+}
+const RND={
+roc:k=>{const d=PD[k];return curve(d.roc,{xl:[0,1],yl:[0,1],xt:T5,yt:T5,xlab:"False positive rate",ylab:"True positive rate"},"AUC "+d.auc,f=>`<line x1="${f.X(0)}" y1="${f.Y(0)}" x2="${f.X(1)}" y2="${f.Y(1)}" stroke="#f59e0b" stroke-width="1.8" stroke-dasharray="5 5"/>`)},
+pr:k=>{const d=PD[k],lo=k==="male"?0.7:0,yt=k==="male"?[.7,.8,.9,1]:T5;return curve(d.pr,{xl:[0,1],yl:[lo,k==="male"?1.03:1],xt:T5,yt,xlab:"Recall (sensitivity)",ylab:"Precision"},"PR-AUC "+MODEL_INFO[k].pr,f=>`<line x1="${f.L}" x2="${f.W-f.R}" y1="${f.Y(d.prev)}" y2="${f.Y(d.prev)}" stroke="#f59e0b" stroke-width="1.8" stroke-dasharray="5 5"/><text x="${f.L+8}" y="${f.Y(d.prev)-6}" fill="#b45309" font-weight="600">prevalence ${d.prev}</text>`)},
+cm:k=>cmHtml(PD[k].cm),
+imp:k=>hbars(PD[k].imp.map(([n,v,s])=>[k==="female"?featLabel(n):escapeHtml(n),v,s]),v=>v.toFixed(k==="female"?3:2),k==="female"?250:210,false),
+coef:k=>hbars(PD.male.coef.map(([n,v])=>[escapeHtml(n),v]),v=>(v>0?"+":"")+v.toFixed(2),170,true),
+grp:k=>{const G=EXTRA.grp,L=120,W=CW,X=v=>L+(v-.5)/.5*(W-L-30),H=G.length*46+60;
+  return wrap(`${[.5,.6,.7,.8,.9,1].map(v=>`<line x1="${X(v)}" x2="${X(v)}" y1="8" y2="${H-40}" stroke="${v===.5?"#f59e0b":"#e8edf3"}" ${v===.5?'stroke-dasharray="5 5"':""}/><text x="${X(v)}" y="${H-24}" text-anchor="middle">${v.toFixed(1)}</text>`).join("")}${G.map((r,i)=>{const y=34+i*46;
+    return `<text x="${L-12}" y="${y+4}" text-anchor="end" font-weight="600" fill="#334155">HC vs ${r[0]}</text><line x1="${X(r[3])}" x2="${X(Math.min(1,r[4]))}" y1="${y}" y2="${y}" stroke="#93c5fd" stroke-width="6" stroke-linecap="round"/><circle cx="${X(r[2])}" cy="${y}" r="7" fill="#2563eb" stroke="#fff" stroke-width="2"/><text x="${X(r[2])}" y="${y-13}" text-anchor="middle" font-weight="700" fill="#1d4ed8">${r[2].toFixed(3)}</text>`}).join("")}<text x="${(L+W)/2}" y="${H-6}" text-anchor="middle" font-weight="600">ROC-AUC with 95% CI</text>`,H)},
+dca:k=>dcaSvg(k)};
+const PERF={
+female:[["Discrimination",[["roc","ROC curve","Random Forest on the held-out test set. Dashed line is chance."],["pr","Precision–recall curve","Dashed line marks the 10.9% prevalence baseline."]]],
+["Classification",[["cm","Confusion matrix","Test set at the 0.52 threshold. Teal cells are correct predictions."]]],
+["Explainability (SHAP)",[["imp","Global feature importance","Top 15 encoded features by mean absolute SHAP value."]]],
+["Decision curve",[["dca","Decision curve analysis","Net benefit of the model against treat-all and treat-none."]]]],
+male:[["Discrimination",[["roc","ROC curve","L1 logistic regression, out-of-fold predictions (n = 113)."],["pr","Precision–recall curve","Dashed line marks the 74.3% prevalence baseline."]]],
+["Classification",[["cm","Confusion matrix","Out-of-fold predictions at the 0.63 threshold."]]],
+["Model structure & robustness",[["coef","Metabolite coefficients","Top 20 coefficients. Blue raises risk, pink lowers it."],["grp","Held-out subgroup ROC-AUC","Train without one diagnostic subgroup, then test on it."]]],
+["Explainability (SHAP)",[["imp","Global feature importance","Top 15 metabolites by mean |SHAP|. Blue raises risk, pink lowers it."]]],
+["Decision curve",[["dca","Decision curve analysis","Net benefit of the model against treat-all and treat-none."]]]]};
+const KPI=[["ROC-AUC","roc","How well the model ranks people. Take one person with infertility and one without: this is the chance the model scores the first as higher risk. 0.5 is a coin flip, 1.0 is perfect."],
+["PR-AUC","pr","How precise the model stays as it finds more cases. Judge it against the baseline, which is the share of cases in the data."],
+["Sensitivity","sensitivity","Of everyone who truly has infertility, the share the model catches. Low means many missed cases."],
+["Specificity","specificity","Of everyone without infertility, the share the model correctly clears. Low means many false alarms."],
+["F1-score","f1","One score balancing precision and sensitivity. 1.0 is best, and it falls if either one is poor."]];
+const band=a=>a>=.9?["Excellent","e"]:a>=.8?["Good","g"]:a>=.7?["Fair","f"]:a>=.6?["Limited","l"]:["Poor","l"];
+const pc=(a,b)=>(a/b*100).toFixed(1)+"%";
+const GUIDE={
+roc:[k=>"Each point on the blue line is one possible cut-off. Moving right flags more people (more false alarms); moving up catches more true cases. The dashed line is pure guessing, so the closer the blue line hugs the top-left corner, the better.",
+ k=>{const a=PD[k].auc;return `AUC is ${a}: pick one person with infertility and one without, and the model gives the first the higher risk about ${Math.round(a*100)}% of the time (50% would be chance).`}],
+pr:[k=>"Precision is how many flagged people truly have infertility; recall is how many true cases get found. The dashed line is the precision of random guessing. A curve well above it means real signal, and a curve that slopes down means catching more cases costs more false alarms.",
+ k=>{const [[tn,fp],[fn,tp]]=PD[k].cm;return `At the chosen threshold ${(tp/(tp+fp)*100).toFixed(0)}% of flagged people truly have infertility, compared with ${(PD[k].prev*100).toFixed(1)}% if the model simply guessed.`}],
+cm:[k=>"Rows are the truth and columns are the model's call. TN = correctly cleared, TP = correctly flagged, FP = false alarm, FN = missed case. Teal tiles are correct and pink tiles are mistakes.",
+ k=>{const [[tn,fp],[fn,tp]]=PD[k].cm;return `Of ${tp+fn} people with infertility the model caught ${tp} (${pc(tp,tp+fn)}). Of ${tn+fp} without it, it wrongly flagged ${fp} (${pc(fp,tn+fp)}).`}],
+imp:[k=>k==="male"?"A longer bar means that metabolite shifts the model's predictions more, on average. Blue means higher levels push risk up and pink means they push it down. It shows importance, not cause.":"A longer bar means the model relies on that feature more (mean absolute SHAP value). It shows how much a feature matters to the model, not that it causes infertility.",
+ k=>{const n=PD[k].imp.slice(0,3).map(x=>k==="female"?featLabel(x[0]):escapeHtml(x[0]));return `The model leans most on ${n[0]}, then ${n[1]} and ${n[2]}.`}],
+coef:[k=>"Each bar is that metabolite's weight in the logistic regression. Positive (blue) means higher levels push the predicted risk up; negative (pink) means they push it down. Longer bars matter more. These are associations, not proof of cause.",
+ k=>{const c=PD.male.coef;return `Strongest push towards higher risk: ${escapeHtml(c[0][0])}. Strongest push towards lower risk: ${escapeHtml(c[c.length-1][0])}.`}],
+grp:[k=>"To test the model on groups it has never seen, it is trained without one diagnostic subgroup and then tested on that subgroup against healthy controls. Dots are the AUC and bars are the 95% confidence range. A wide bar means less certainty.",
+ k=>{const a=EXTRA.grp.map(r=>r[2]);return `AUC stays between ${Math.min(...a).toFixed(2)} and ${Math.max(...a).toFixed(2)} on all four held-out subgroups, well above the 0.5 chance line.`}],
+dca:[k=>"Decision curve analysis asks whether acting on the model does more good than harm. Net benefit is the value of correct flags minus the cost of false alarms at each threshold. The model only helps where the blue line sits above both the amber line (flag everyone) and the grey line (flag no one).",
+ k=>k==="female"?"The blue line never rises above both defaults, so this model does not show net benefit over simple strategies. It is a research result, not a decision aid.":"The blue line stays above both defaults at almost every threshold (96 of 99), which supports its usefulness in this dataset."]};
+function renderPerf(k){
+  const m=MODEL_INFO[k];
+  $("perfBody").innerHTML=`<p class="hint" style="margin:16px 2px 0">New to these terms? Every number has a plain-language note, and every chart has a short guide underneath.</p><div class="pk">${KPI.map(([l,f,d])=>{const b=f==="roc"?band(+m.roc):null;return `<div><span>${l}</span><b>${m[f]}${b?`<em class="bd ${b[1]}" title="Rough guide: 0.9+ excellent, 0.8–0.9 good, 0.7–0.8 fair, 0.6–0.7 limited">${b[0]}</em>`:""}</b><p>${d}${f==="pr"?` Baseline here: ${PD[k].prev}.`:""}</p></div>`}).join("")}</div>`+
+  `<div class="fgal" style="margin-top:20px">${PERF[k].flatMap(([h,figs])=>figs.map(([n,t,c])=>`<div class="fig${n==="dca"?" full":""}"><div class="im">${RND[n](k)}</div><div class="c"><em class="cat">${h}</em><b>${t}</b><span>${c}</span></div><div class="gd"><div><b>How to read it</b><p>${GUIDE[n][0](k)}</p></div><div><b>In this model</b><p>${GUIDE[n][1](k)}</p></div></div></div>`)).join("")}</div>`;
+}
+$("segPerf").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+  $("segPerf").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b));renderPerf(b.dataset.model)});
+$("perfBody").addEventListener("click",e=>{const f=e.target.closest(".fig");if(!f||!e.target.closest(".im"))return;
+  $("lb").firstElementChild.innerHTML=f.querySelector(".im").innerHTML;$("lb").classList.add("on")});
+$("lb").addEventListener("click",e=>{if(e.target===$("lb"))$("lb").classList.remove("on")});
+addEventListener("keydown",e=>{if(e.key==="Escape")$("lb").classList.remove("on")});
+renderPerf("female");
+
+buildFields();buildInfo();placeholder();
+if(!location.hash)location.hash="#predict";route();
+</script>
+</body>
+</html>

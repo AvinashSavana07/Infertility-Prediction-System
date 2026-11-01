@@ -1,0 +1,3 @@
+Dataset,N,Model,Validation,ROC_AUC,PR_AUC,Balanced_Accuracy,Sensitivity,Specificity,Precision,F1
+Female NHANES,5431,Tuned Random Forest,Untouched final test set,0.7237,0.2168,0.6648,0.6629,0.6667,0.196,0.3026
+Male plasma metabolomics,113,L1 Logistic Regression,5-fold out-of-fold validation,0.9865,0.9956,0.9643,0.9286,1.0,1.0,0.963

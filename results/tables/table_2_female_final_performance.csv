@@ -1,0 +1,2 @@
+Dataset,N,Model,Validation,ROC_AUC,PR_AUC,Balanced_Accuracy,Sensitivity,Specificity,Precision,F1,Operating_Threshold,ROC_AUC_CI_Lower,ROC_AUC_CI_Upper
+Female NHANES,5431,Tuned Random Forest,Untouched final test set,0.7237,0.2168,0.6648,0.6629,0.6667,0.196,0.3026,0.52,0.6735,0.7719
