@@ -86,6 +86,12 @@ def load_models():
     male_model = joblib.load(male_path)
 
 
+def ensure_models_loaded():
+    """Load models once if not yet initialized (needed for WSGI/serverless)."""
+    if female_model is None or male_model is None:
+        load_models()
+
+
 # ============================================================
 # PIPELINE HELPERS
 # ============================================================
@@ -304,6 +310,7 @@ def male_shap(model, X):
 # ============================================================
 
 def make_prediction(model_name, raw_features):
+    ensure_models_loaded()
 
     if model_name == "female":
         model = female_model
@@ -380,6 +387,7 @@ def home():
 
 @app.route("/api/health", methods=["GET"])
 def health():
+    ensure_models_loaded()
 
     return jsonify({
         "status": "ok",
